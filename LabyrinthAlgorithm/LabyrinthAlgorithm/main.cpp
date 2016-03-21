@@ -8,12 +8,14 @@ const int LABYRINTH_WIDTH = 200;
 const int LABYRINTH_HEIGHT = 200;
 
 //Create the structure for the disjunkta mängder
-struct Node {
+class Node {
+public:
 	Node* p;
 	sf::Color c;
 	int accessed;
 	Node() { p = NULL; c = sf::Color::Red; accessed = 0; }
 	Node(Node* parent, sf::Color color, int accessed = 4) { p = parent; c = color; accessed = accessed; }
+	~Node() { this->p = NULL; }
 }labyrinth[LABYRINTH_WIDTH][LABYRINTH_HEIGHT];
 
 sf::RectangleShape toShape(Node* node, int x, int y);

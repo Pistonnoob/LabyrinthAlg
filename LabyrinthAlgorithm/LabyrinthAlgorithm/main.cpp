@@ -19,24 +19,34 @@ sf::RectangleShape toShape(Node* node, int x, int y);
 
 Node* FindSet(Node* x)
 {
-	return x;
+	//Path compression
+	if (x != x->p)
+		x->p = FindSet(x->p);
+	return x->p;
 }
 
 void Link(Node* x, Node* y)
 {
-
+	if (x->r > y->r)
+		y->p = x;
+	else
+	{
+		x->p = y;
+		if (x->r == y->r)
+			y->r++;
+	}
 }
 
-void Union(sf::Vector2i f, sf::Vector2i s)
+void Union(Node* x, Node* y)
 {
-
+	Link(FindSet(x), FindSet(y));
 }
 
 
 int main()
 {
 
-	//Create the shapes
+	//Create the rooms
 	for (int x = 0; x < LABYRINTH_WIDTH; x++)
 	{
 		for (int y = 0; y < LABYRINTH_HEIGHT; y++)

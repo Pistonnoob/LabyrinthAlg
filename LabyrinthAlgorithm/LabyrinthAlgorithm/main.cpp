@@ -7,17 +7,17 @@ const int WINDOW_HEIGHT = 400;
 const int LABYRINTH_WIDTH = 200;
 const int LABYRINTH_HEIGHT = 200;
 
+//Create the structure for the disjunkta mängder
+struct Node {
+	Node* p;
+	sf::Color c;
+	int accessed;
+	Node() { p = NULL; c = sf::Color::Red; accessed = 0; }
+	Node(Node* parent, sf::Color color, int accessed = 4) { p = parent; c = color; accessed = accessed; }
+}labyrinth[LABYRINTH_WIDTH][LABYRINTH_HEIGHT];
+
 int main()
 {
-	//Create the structure for the disjunkta mängder
-	struct Node {
-		Node* p;
-		sf::Color c;
-		int accessed;
-		Node() { p = NULL; c = sf::Color::Red; accessed = 0; }
-		Node(Node* parent, sf::Color color, int accessed = 4) { p = parent; c = color; accessed = accessed; }
-	}labyrinth[LABYRINTH_WIDTH][LABYRINTH_HEIGHT];
-
 	for (int x = 0; x < LABYRINTH_WIDTH; x++)
 	{
 		for (int y = 0; y < LABYRINTH_HEIGHT; y++)
@@ -49,6 +49,7 @@ int main()
 		{
 			for (int y = 0; y < LABYRINTH_HEIGHT; y++)
 			{
+				window.draw(toShape(&labyrinth[x][y]));
 			}
 		}
 
@@ -56,4 +57,11 @@ int main()
 	}
 
 	return 0;
+}
+
+sf::RectangleShape toShape(Node* node)
+{
+	sf::RectangleShape rShape;
+
+	return rShape;
 }

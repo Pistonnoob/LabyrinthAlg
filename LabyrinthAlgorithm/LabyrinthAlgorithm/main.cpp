@@ -1,7 +1,6 @@
 
 #include<SFML\Graphics.hpp>
 
-
 const int WINDOW_WIDTH = 400;
 const int WINDOW_HEIGHT = 400;
 const int LABYRINTH_WIDTH = 200;
@@ -11,12 +10,28 @@ const int LABYRINTH_HEIGHT = 200;
 struct Node {
 	Node* p;
 	sf::Color c;
-	int accessed;
-	Node() { p = NULL; c = sf::Color::Red; accessed = 0; }
-	Node(Node* parent, sf::Color color, int accessed = 4) { p = parent; c = color; accessed = accessed; }
+	int r;
+	Node() { p = NULL; c = sf::Color::Red; r = 0; }
+	Node(Node* parent, sf::Color color, int rank = 0) { p = parent; c = color; r = rank; }
 }labyrinth[LABYRINTH_WIDTH][LABYRINTH_HEIGHT];
 
 sf::RectangleShape toShape(Node* node, int x, int y);
+
+Node* FindSet(Node* x)
+{
+	return x;
+}
+
+void Link(Node* x, Node* y)
+{
+
+}
+
+void Union(sf::Vector2i f, sf::Vector2i s)
+{
+
+}
+
 
 int main()
 {
@@ -26,7 +41,7 @@ int main()
 	{
 		for (int y = 0; y < LABYRINTH_HEIGHT; y++)
 		{
-			labyrinth[x][y] = Node(&labyrinth[x][y], sf::Color(), 4);
+			labyrinth[x][y] = Node(&labyrinth[x][y], sf::Color(), 0);
 			labyrinth[x][y].c.r += (int)((255 / LABYRINTH_WIDTH) * (x + 1));
 			labyrinth[x][y].c.g += (int)((255 / LABYRINTH_HEIGHT) * (y + 1));
 		}

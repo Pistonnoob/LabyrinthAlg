@@ -16,15 +16,19 @@ struct Node {
 	Node(Node* parent, sf::Color color, int accessed = 4) { p = parent; c = color; accessed = accessed; }
 }labyrinth[LABYRINTH_WIDTH][LABYRINTH_HEIGHT];
 
+sf::RectangleShape toShape(Node* node, int x, int y);
+
 int main()
 {
+
+	//Create the shapes
 	for (int x = 0; x < LABYRINTH_WIDTH; x++)
 	{
 		for (int y = 0; y < LABYRINTH_HEIGHT; y++)
 		{
-			labyrinth[x][y] = Node(&labyrinth[x][y], sf::Color::Red, 4);
-			labyrinth[x][y].c.r -= 255 % (int)((255 / LABYRINTH_WIDTH) * x);
-			labyrinth[x][y].c.g -= 255 % (int)((255 / LABYRINTH_HEIGHT) * y);
+			labyrinth[x][y] = Node(&labyrinth[x][y], sf::Color(), 4);
+			labyrinth[x][y].c.r += (int)((255 / LABYRINTH_WIDTH) * (x + 1));
+			labyrinth[x][y].c.g += (int)((255 / LABYRINTH_HEIGHT) * (y + 1));
 		}
 	}
 
@@ -32,8 +36,20 @@ int main()
 	sf::CircleShape shape(100.f);
 	shape.setFillColor(sf::Color::Green);
 
-	//Create the shapes
+	//Do the algorithm
+	
+	//Draw the screen
+	window.clear();
 
+	for (int x = 0; x < LABYRINTH_WIDTH; x++)
+	{
+		for (int y = 0; y < LABYRINTH_HEIGHT; y++)
+		{
+			window.draw(toShape(&labyrinth[x][y], x, y));
+		}
+	}
+
+	window.display();
 	while (window.isOpen())
 	{
 		sf::Event event;
@@ -43,25 +59,17 @@ int main()
 				window.close();
 		}
 
-		window.clear();
+		
 
-		for (int x = 0; x < LABYRINTH_WIDTH; x++)
-		{
-			for (int y = 0; y < LABYRINTH_HEIGHT; y++)
-			{
-				window.draw(toShape(&labyrinth[x][y]));
-			}
-		}
-
-		window.display();
 	}
 
 	return 0;
 }
 
-sf::RectangleShape toShape(Node* node)
+sf::RectangleShape toShape(Node* node, int x, int y)
 {
-	sf::RectangleShape rShape;
-
+	sf::RectangleShape rShape(sf::Vector2f(WINDOW_WIDTH / LABYRINTH_WIDTH, WINDOW_HEIGHT / LABYRINTH_HEIGHT));
+	rShape.setPosition(sf::Vector2f(x * (WINDOW_WIDTH / LABYRINTH_WIDTH), y * (WINDOW_HEIGHT / LABYRINTH_HEIGHT)));
+	rShape.setFillColor(node->c);
 	return rShape;
 }

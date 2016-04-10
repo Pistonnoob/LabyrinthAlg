@@ -8,8 +8,8 @@
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 800;
-const int LABYRINTH_WIDTH = 400;
-const int LABYRINTH_HEIGHT = 400;
+const int LABYRINTH_WIDTH = 800;
+const int LABYRINTH_HEIGHT = 800;
 const int CELL_WIDTH = WINDOW_WIDTH / LABYRINTH_WIDTH;
 const int CELL_HEIGHT = WINDOW_HEIGHT / LABYRINTH_HEIGHT;
 const int WALL_THICKNESS = 1;
@@ -23,7 +23,7 @@ struct Node {
 }labyrinth[LABYRINTH_WIDTH][LABYRINTH_HEIGHT];
 
 struct Wall {
-	int x, y, w, h;
+	int x, y, w, h;	//For rendering reasons
 	Node* first;
 	Node* second;
 };
@@ -128,7 +128,7 @@ int main()
 	
 	//I count the time used to randomize the wall access as time used for the algorithm. Because it is part of the algorithm.
 	auto engine = std::default_random_engine{};
-	//std::shuffle(std::begin(walls), std::end(walls), engine);
+	std::shuffle(std::begin(walls), std::end(walls), engine);
 
 
 	int misses = 0;
@@ -139,24 +139,13 @@ int main()
 			std::cout << "The walls were emptied, something went wrong." << std::endl;
 			break;
 		}
-		//int indexForWall = GetRand(0, walls.size());
-		//Wall* wallToRemove = walls[indexForWall];		//Check if valid wall
 		Wall* wallToRemove = walls.back();
-		int fX = wallToRemove->x / CELL_WIDTH, fY = wallToRemove->y / CELL_HEIGHT;
-		int sX = (wallToRemove->x + wallToRemove->w) / CELL_WIDTH, sY = (wallToRemove->y + wallToRemove->h) / CELL_HEIGHT;
-		Node* first = &labyrinth[fX][fY];
-		Node* second = &labyrinth[sX][sY];
 		Node* m_first = wallToRemove->first;
 		Node* m_second = wallToRemove->second;
-		if (first == NULL || second == NULL)
-		{
-			break;
-		}
-		if (FindSet(first) != FindSet(second))
+		if (FindSet(m_first) != FindSet(m_second))
 		{
 			//Bind them together
-			//Union(wallToRemove->first, wallToRemove->second);
-			Union(first, second);
+			Union(m_first, m_second);
 			groups--;
 			delete wallToRemove;
 		}
@@ -166,7 +155,6 @@ int main()
 			checkedWalls.push_back(wallToRemove);
 		}
 		walls.pop_back();
-		//walls.erase(walls.begin() + indexForWall);
 	}
 	renderTime = timer.getElapsedTime();
 	algTime = renderTime - algTime;

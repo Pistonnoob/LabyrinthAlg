@@ -3,11 +3,13 @@
 #include <stdlib.h>
 #include <ctime>
 #include <iostream>
+#include <algorithm>
+#include <random>
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 800;
-const int LABYRINTH_WIDTH = 900;
-const int LABYRINTH_HEIGHT = 900;
+const int LABYRINTH_WIDTH = 400;
+const int LABYRINTH_HEIGHT = 400;
 const int CELL_WIDTH = WINDOW_WIDTH / LABYRINTH_WIDTH;
 const int CELL_HEIGHT = WINDOW_HEIGHT / LABYRINTH_HEIGHT;
 const int WALL_THICKNESS = 1;
@@ -20,13 +22,13 @@ struct Node {
 	Node(Node* parent, sf::Color color, int rank = 0) {	p = parent; c = color; r = rank;}
 }labyrinth[LABYRINTH_WIDTH][LABYRINTH_HEIGHT];
 
-//Create a list of walls
 struct Wall {
 	int x, y, w, h;
 	Node* first;
 	Node* second;
 };
 
+//Create a list of walls
 std::vector<Wall*> walls;
 std::vector<Wall*> checkedWalls;
 
@@ -75,9 +77,11 @@ int main()
 	srand(time(NULL));
 
 	sf::Clock timer;
-	sf::Time algTime, runTime, setupTime;
+	sf::Time algTime, runTime, setupTime, renderTime;
 
 	int groups = LABYRINTH_WIDTH * LABYRINTH_HEIGHT;
+
+
 
 	//Create the rooms
 	for (int x = 0; x < LABYRINTH_WIDTH; x++)
@@ -120,10 +124,15 @@ int main()
 	
 	sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Labyrinth Algorithm");
 
-	setupTime = timer.getElapsedTime();
-	algTime = timer.getElapsedTime();
+	setupTime = algTime = timer.getElapsedTime();
+	
+	//I count the time used to randomize the wall access as time used for the algorithm. Because it is part of the algorithm.
+	auto engine = std::default_random_engine{};
+	//std::shuffle(std::begin(walls), std::end(walls), engine);
+
 
 	int misses = 0;
+	int wallIndex = 0;
 	while (groups > 1)
 	{
 		if (walls.size() == 0)
@@ -131,14 +140,24 @@ int main()
 			std::cout << "The walls were emptied, something went wrong." << std::endl;
 			break;
 		}
-		int indexForWall = GetRand(0, walls.size());
-		Wall* wallToRemove = walls[indexForWall];		//Check if valid wall
-		Node* first = wallToRemove->first;
-		Node* second = wallToRemove->second;
+		//int indexForWall = GetRand(0, walls.size());
+		//Wall* wallToRemove = walls[indexForWall];		//Check if valid wall
+		Wall* wallToRemove = walls[wallIndex++];
+		int fX = wallToRemove->x / CELL_WIDTH, fY = wallToRemove->y / CELL_HEIGHT;
+		int sX = (wallToRemove->x + wallToRemove->w) / CELL_WIDTH, sY = (wallToRemove->y + wallToRemove->h) / CELL_HEIGHT;
+		Node* first = &labyrinth[fX][fY];
+		Node* m_first = wallToRemove->first;
+		Node* m_second = wallToRemove->second;
+		Node* second = &labyrinth[sX][sY];
+		if (first == NULL || second == NULL)
+		{
+			break;
+		}
 		if (FindSet(first) != FindSet(second))
 		{
 			//Bind them together
-			Union(wallToRemove->first, wallToRemove->second);
+			//Union(wallToRemove->first, wallToRemove->second);
+			Union(first, second);
 			groups--;
 			delete wallToRemove;
 		}
@@ -147,9 +166,11 @@ int main()
 			misses++;
 			checkedWalls.push_back(wallToRemove);
 		}
-		walls.erase(walls.begin() + indexForWall);
+		walls.pop_back();
+		//walls.erase(walls.begin() + indexForWall);
 	}
-	algTime = timer.getElapsedTime() - algTime;
+	renderTime = timer.getElapsedTime();
+	algTime = renderTime - algTime;
 	//Draw the screen
 	window.clear();
 	sf::RectangleShape background(sf::Vector2f(WINDOW_WIDTH, WINDOW_HEIGHT));
@@ -171,8 +192,9 @@ int main()
 	}
 	window.display();
 	runTime = timer.getElapsedTime();
+	renderTime = runTime - renderTime;
 
-	std::cout << "Number of misses: " << misses << ". " << std::endl<< "Setup timer: " << setupTime.asSeconds() << ". Algorithm timer: " << algTime.asSeconds() << ". Run time of execution: " << runTime.asSeconds() << "." << std::endl;
+	std::cout << "Number of misses: " << misses << ". " << std::endl<< "Setup timer: " << setupTime.asSeconds() << ".\nAlgorithm timer: " << algTime.asSeconds() << ".\nRender timer: " << renderTime.asSeconds() << ".\nRun time of execution: " << runTime.asSeconds() << "." << std::endl;
 
 	while (window.isOpen())
 	{

@@ -8,8 +8,8 @@
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 800;
-const int LABYRINTH_WIDTH = 800;
-const int LABYRINTH_HEIGHT = 800;
+const int LABYRINTH_WIDTH = 400;
+const int LABYRINTH_HEIGHT = 400;
 const int CELL_WIDTH = WINDOW_WIDTH / LABYRINTH_WIDTH;
 const int CELL_HEIGHT = WINDOW_HEIGHT / LABYRINTH_HEIGHT;
 const int WALL_THICKNESS = 1;
@@ -74,8 +74,8 @@ void Union(Node* x, Node* y)
 
 int main()
 {
-	srand(time(NULL));
-
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	srand(unsigned(time(NULL)));
 	sf::Clock timer;
 	sf::Time algTime, runTime, setupTime, renderTime;
 
@@ -105,7 +105,7 @@ int main()
 				nodeWall->x = (x + 1) * CELL_WIDTH;
 				nodeWall->y = (y)* CELL_HEIGHT;
 				nodeWall->w = WALL_THICKNESS;
-				nodeWall->h = CELL_WIDTH;
+				nodeWall->h = CELL_HEIGHT;
 				walls.push_back(nodeWall);
 			}
 			if (y < LABYRINTH_HEIGHT - 1)
@@ -115,12 +115,48 @@ int main()
 				nodeWall->second = &labyrinth[x][y + 1];
 				nodeWall->x = (x)* CELL_WIDTH;
 				nodeWall->y = (y + 1)* CELL_HEIGHT;
-				nodeWall->w = CELL_HEIGHT;
+				nodeWall->w = CELL_WIDTH;
 				nodeWall->h = WALL_THICKNESS;
 				walls.push_back(nodeWall);
 			}
 		}
 	}
+
+#pragma region
+	//Create the outline of the grid
+	Wall* top = new Wall();
+	top->x = CELL_WIDTH;
+	top->y = 0;
+	top->w = WINDOW_WIDTH - CELL_WIDTH;
+	top->h = 1;
+	top->first = NULL;
+	top->second = NULL;
+	checkedWalls.push_back(top);
+	Wall* left = new Wall();
+	left->x = 0;
+	left->y = CELL_HEIGHT;
+	left->w = 1;
+	left->h = WINDOW_HEIGHT - CELL_HEIGHT;
+	left->first = NULL;
+	left->second = NULL;
+	checkedWalls.push_back(left);
+	Wall* down = new Wall();
+	down->x = 0;
+	down->y = WINDOW_HEIGHT-1;
+	down->w = WINDOW_WIDTH - CELL_WIDTH;
+	down->h = 1;
+	down->first = NULL;
+	down->second = NULL;
+	checkedWalls.push_back(down);
+	Wall* right = new Wall();
+	right->x = WINDOW_WIDTH-1;
+	right->y = 0;
+	right->w = 1;
+	right->h = WINDOW_HEIGHT - CELL_HEIGHT;
+	right->first = NULL;
+	right->second = NULL;
+	checkedWalls.push_back(right);
+#pragma endregion outline
 	
 	sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Labyrinth Algorithm");
 
@@ -128,7 +164,8 @@ int main()
 	
 	//I count the time used to randomize the wall access as time used for the algorithm. Because it is part of the algorithm.
 	auto engine = std::default_random_engine{};
-	std::shuffle(std::begin(walls), std::end(walls), engine);
+	//std::shuffle(std::begin(walls), std::end(walls), engine);
+	std::random_shuffle(std::begin(walls), std::end(walls));
 
 
 	int misses = 0;
@@ -163,19 +200,22 @@ int main()
 	sf::RectangleShape background(sf::Vector2f(WINDOW_WIDTH, WINDOW_HEIGHT));
 	background.setFillColor(sf::Color::White);
 	window.draw(background);
-	for (std::vector<Wall*>::const_iterator index = walls.begin(); index != walls.end(); index++)
+	if (WINDOW_WIDTH > LABYRINTH_WIDTH || WINDOW_HEIGHT > LABYRINTH_HEIGHT)
 	{
-		sf::RectangleShape line(sf::Vector2f((*index)->w, (*index)->h));
-		line.setPosition(sf::Vector2f((*index)->x, (*index)->y));
-		line.setFillColor(sf::Color::Black);
-		window.draw(line);
-	}
-	for (std::vector<Wall*>::const_iterator index = checkedWalls.begin(); index != checkedWalls.end(); index++)
-	{
-		sf::RectangleShape line(sf::Vector2f((*index)->w, (*index)->h));
-		line.setPosition(sf::Vector2f((*index)->x, (*index)->y));
-		line.setFillColor(sf::Color::Black);
-		window.draw(line);
+		for (std::vector<Wall*>::const_iterator index = walls.begin(); index != walls.end(); index++)
+		{
+			sf::RectangleShape line(sf::Vector2f((*index)->w, (*index)->h));
+			line.setPosition(sf::Vector2f((*index)->x, (*index)->y));
+			line.setFillColor(sf::Color::Black);
+			window.draw(line);
+		}
+		for (std::vector<Wall*>::const_iterator index = checkedWalls.begin(); index != checkedWalls.end(); index++)
+		{
+			sf::RectangleShape line(sf::Vector2f((*index)->w, (*index)->h));
+			line.setPosition(sf::Vector2f((*index)->x, (*index)->y));
+			line.setFillColor(sf::Color::Black);
+			window.draw(line);
+		}
 	}
 	window.display();
 	runTime = timer.getElapsedTime();
@@ -191,6 +231,16 @@ int main()
 			if (event.type == sf::Event::Closed)
 				window.close();
 		}
+	}
+	while (walls.size())
+	{
+		delete walls.back();
+		walls.pop_back();
+	}
+	while (checkedWalls.size())
+	{
+		delete checkedWalls.back();
+		checkedWalls.pop_back();
 	}
 
 	return 0;

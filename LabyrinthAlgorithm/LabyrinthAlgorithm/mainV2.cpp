@@ -132,7 +132,6 @@ int main()
 
 
 	int misses = 0;
-	int wallIndex = 0;
 	while (groups > 1)
 	{
 		if (walls.size() == 0)
@@ -142,13 +141,13 @@ int main()
 		}
 		//int indexForWall = GetRand(0, walls.size());
 		//Wall* wallToRemove = walls[indexForWall];		//Check if valid wall
-		Wall* wallToRemove = walls[wallIndex++];
+		Wall* wallToRemove = walls.back();
 		int fX = wallToRemove->x / CELL_WIDTH, fY = wallToRemove->y / CELL_HEIGHT;
 		int sX = (wallToRemove->x + wallToRemove->w) / CELL_WIDTH, sY = (wallToRemove->y + wallToRemove->h) / CELL_HEIGHT;
 		Node* first = &labyrinth[fX][fY];
+		Node* second = &labyrinth[sX][sY];
 		Node* m_first = wallToRemove->first;
 		Node* m_second = wallToRemove->second;
-		Node* second = &labyrinth[sX][sY];
 		if (first == NULL || second == NULL)
 		{
 			break;

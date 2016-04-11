@@ -1,13 +1,12 @@
-
-#include <SFML\Graphics.hpp>
 #include <stdlib.h>
 #include <ctime>
 #include <iostream>
 #include <algorithm>
 #include <random>
+#include <SFML\Graphics.hpp>
 
-const int WINDOW_WIDTH = 800;
-const int WINDOW_HEIGHT = 800;
+const int WINDOW_WIDTH = 2000;
+const int WINDOW_HEIGHT = 2000;
 const int LABYRINTH_WIDTH = 400;
 const int LABYRINTH_HEIGHT = 400;
 const int CELL_WIDTH = WINDOW_WIDTH / LABYRINTH_WIDTH;

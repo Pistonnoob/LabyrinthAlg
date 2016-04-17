@@ -8,8 +8,8 @@
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 800;
-const int LABYRINTH_WIDTH = 400;
-const int LABYRINTH_HEIGHT = 400;
+const int LABYRINTH_WIDTH = 10000;
+const int LABYRINTH_HEIGHT = 10000;
 const int CELL_WIDTH = WINDOW_WIDTH / LABYRINTH_WIDTH;
 const int CELL_HEIGHT = WINDOW_HEIGHT / LABYRINTH_HEIGHT;
 const int WALL_THICKNESS = 1;
@@ -74,7 +74,7 @@ void Union(Node* x, Node* y)
 
 int main()
 {
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	srand(unsigned(time(NULL)));
 	sf::Clock timer;
 	sf::Time algTime, runTime, setupTime, renderTime;
